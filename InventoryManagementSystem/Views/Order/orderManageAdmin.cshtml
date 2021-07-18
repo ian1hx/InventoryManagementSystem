@@ -1,12 +1,11 @@
-﻿@*未審核訂單數量框 還沒歸還數量框
-
-    待審核訂單/ALL/自己處理的/還沒歸還的(進行中訂單)/已經結束的*@
-<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+﻿<link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
 <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
 <script src="https://unpkg.com/vue/dist/vue.min.js"></script>
 <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
 <div id="app">
+    <!--提醒-->
     <div>
         <b-button variant="warning" class="font-weight-bolder">
             <img src="/images/timer_black_24dp.svg" />
@@ -33,196 +32,626 @@
             使用者申請遺失 <b-badge variant="light" class="text-dark">4</b-badge>
         </b-button>
     </div>
-        </br>
-        <b-tabs active-nav-item-class="font-weight-bold text-uppercase text-danger"
-                active-tab-class="font-weight-bold text-dark" content-class="mt-3" fill>
-            <b-tab title="所有訂單" active>
-                <b-navbar-nav class="ml-auto">
-                    <b-nav-form>
-                        <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
-                        <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
-                    </b-nav-form>
-                    <hr/>
-                    <template>
+
+    </br>
+    <!--ALL ORDERS-->
+    <b-tabs active-nav-item-class="font-weight-bold text-uppercase text-danger"
+            active-tab-class="font-weight-bold text-dark" content-class="mt-3" fill>
+        <b-tab title="所有訂單" active v-on:click="GetAllOrders">
+            <b-navbar-nav class="ml-auto">
+                <b-nav-form>
+                    <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
+                    <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
+                </b-nav-form>
+                <hr />
+                <template>
+                    <div>
                         <div>
-                            <b-table :items="items" :fields="fields" striped responsive="sm">
-                                <template #cell(show_details)="row">
-                                    <b-button size="sm" @@click="row.toggleDetails" class="mr-2">
-                                        {{ row.detailsShowing ? '隱藏' : '顯示'}}
-                                    </b-button>
-
-                                    <!-- As `row.showDetails` is one-way, we call the toggleDetails function on @@change -->
-                                    <b-form-checkbox v-model="row.detailsShowing" @@change="row.toggleDetails">
-                                        Details via check
-                                    </b-form-checkbox>
-                                </template>
-
-                                <template #row-details="row">
-                                    <b-card>
-
-                                        <b-row>
-                                            <b-col><b>物品ID</b></b-col>
-                                            <b-col><b>物品SN</b></b-col>
-                                            <b-col><b>物品狀態</b></b-col>
-                                        </b-row>
-                                        <b-row class="mb-2 text-sm-right" sm="3" v-for="item in row.item.loop">
-                                            <b-col>{{ item.itemId }}</b-col>
-                                            <b-col>{{ item.itemSN }}</b-col>
-                                            <b-col>{{ item.orderDetailStatus }}</b-col>
-                                        </b-row>
-
-                                        
-
-                                        <b-button size="sm" @@click="row.toggleDetails">隱藏</b-button>
-                                    </b-card>
-                                </template>
-                            </b-table>
+                            排序:
+                            <b>{{ sortDesc ? '倒序' : '正序' }}</b>
                         </div>
-                    </template>
+                        <b-table :items="items"
+                                 :fields="fields"
+                                 :sort-by.sync="sortBy"
+                                 :sort-desc.sync="sortDesc"
+                                 sort-icon-left
+                                 responsive="sm" striped>
+                        <template #cell(show_details)="row">
+                            <b-button size="sm" @@click="row.toggleDetails" class="mr-2">
+                                {{ row.detailsShowing ? '隱藏' : '顯示'}}
+                            </b-button>
 
-                    <p>I'm the first tab</p>
+                            <!-- As `row.showDetails` is one-way, we call the toggleDetails function on @@change -->
+                            @*<b-form-checkbox v-model="row.detailsShowing" @@change="row.toggleDetails">
+                Details via check
+            </b-form-checkbox>*@
+                        </template>
+
+                        <template #row-details="row">
+                            <b-card>
+                                <b-row>
+                                    <b-col><b>訂單明細編號</b></b-col>
+                                    <b-col><b>物品ID</b></b-col>
+                                    <b-col><b>物品SN</b></b-col>
+                                    <b-col><b>物品狀態</b></b-col>
+                                </b-row>
+                                <hr />
+                                <b-row v-for="item in row.item.orderDetails">
+                                    <b-col>{{ item.orderDetailId }}</b-col>
+                                    <b-col>{{ item.itemId }}</b-col>
+                                    <b-col>{{ item.itemSn }}</b-col>
+                                    <b-col>{{ item.orderDetailStatus }}</b-col>
+                                </b-row>
+
+
+
+                                <b-button size="sm" @@click="row.toggleDetails">隱藏</b-button>
+                            </b-card>
+                        </template>
+                        </b-table>
+                    </div>
+                </template>
+        </b-tab>
+        <br />
+        <!--PENDING ORDERS-->
+        <b-tab title="待核可" v-on:click="GetPendingOrders">
+
+            <b-navbar-nav class="ml-auto">
+                <b-nav-form>
+                    <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
+                    <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
+                </b-nav-form>
+                <hr />
+                <template>
+                    <div>
+                        <p>
+                            <span>
+                                <b-button size="sm" @@click="selectAllRows">全選</b-button>
+                                <b-button size="sm" @@click="clearSelected">清除</b-button>
+                            </span>
+                            <span class="float-right">
+                                <b-button size="sm" @@click="distributeItems()">核可</b-button>
+                                <b-button size="sm" @@click="">拒絕</b-button>
+                            </span>
+                        </p>
+                        <div>
+                            排序:
+                            <b>{{ sortDesc ? '倒序' : '正序' }}</b>
+                        </div>
+                        <b-table :items="items"
+                                 :fields="fields"
+                                 :select-mode="selectMode"
+                                 responsive="sm"
+                                 ref="selectableTable"
+                                 :sort-by.sync="sortBy"
+                                 :sort-desc.sync="sortDesc"
+                                 sort-icon-left
+                                 selectable
+                                 @@row-selected="onRowSelected">
+
+                            <!-- Example scoped slot for select state illustrative purposes -->
+                            <template #cell(selected)="{ rowSelected }">
+                                <template v-if="rowSelected">
+                                    <span aria-hidden="true">&check;</span>
+                                    <span class="sr-only">Selected</span>
+                                </template>
+                                <template v-else>
+                                    <span aria-hidden="true">&nbsp;</span>
+                                    <span class="sr-only">Not selected</span>
+                                </template>
+                            </template>
+                        </b-table>
+                        <p>
+                            <span>
+                                <b-button size="sm" @@click="selectAllRows">全選</b-button>
+                                <b-button size="sm" @@click="clearSelected">清除</b-button>
+                            </span>
+                            <span class="float-right">
+                                <b-button size="sm" @@click="">核可</b-button>
+                                <b-button size="sm" @@click="">拒絕</b-button>
+                            </span>
+                        </p>
+                        <p>
+                            Selected Rows:<br>
+                            {{ selected }}
+                        </p>
+                    </div>
+                </template>
+
+        </b-tab>
+
+        <!--PICKUP ORDERS-->
+        <b-tab title="待領取" v-on:click="PickUpOrders">
+            <b-navbar-nav class="ml-auto">
+                <b-nav-form>
+                    <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
+                    <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
+                </b-nav-form>
+                <hr />
+                <template>
+                    <div>
+                        <div>
+                            排序:
+                            <b>{{ sortDesc ? '倒序' : '正序' }}</b>
+                        </div>
+                        <b-table :items="items" :fields="fields" :sort-by.sync="sortBy"
+                                 :sort-desc.sync="sortDesc"
+                                 sort-icon-left striped responsive="sm">
+                            <template #cell(show_details)="row">
+                                <b-button size="sm" @@click="row.toggleDetails" class="mr-2">
+                                    {{ row.detailsShowing ? '隱藏' : '顯示'}}
+                                </b-button>
+
+                                <!-- As `row.showDetails` is one-way, we call the toggleDetails function on @@change -->
+                                @*<b-form-checkbox v-model="row.detailsShowing" @@change="row.toggleDetails">
+                    Details via check
+                </b-form-checkbox>*@
+                            </template>
+
+                            <template #row-details="row">
+                                <b-card>
+                                    <b-row>
+                                        <b-col><b>訂單明細編號</b></b-col>
+                                        <b-col><b>物品ID</b></b-col>
+                                        <b-col><b>物品SN</b></b-col>
+                                        <b-col><b>物品狀態</b></b-col>
+                                        <b-col><b>動作</b></b-col>
+                                    </b-row>
+                                    <hr />
+                                    <b-row v-for="item in row.item.orderDetails">
+                                        <b-col>{{ item.orderDetailId }}</b-col>
+                                        <b-col>{{ item.itemId }}</b-col>
+                                        <b-col>{{ item.itemSn }}</b-col>
+                                        <b-col>{{ item.orderDetailStatus }}</b-col>
+                                        <b-col>
+                                            <b-button size="sm" @@click="">領取</b-button>
+                                            <b-button size="sm" @@click="">取消</b-button>
+                                        </b-col>
+
+                                    </b-row>
+
+
+
+                                    <b-button size="sm" @@click="row.toggleDetails">隱藏</b-button>
+                                </b-card>
+                            </template>
+                        </b-table>
+                    </div>
+                </template>
+
+
+        </b-tab>
+
+        <!--ONGOING ORDERS-->
+        <b-tab title="租借中" v-on:click="OnGoingOrders">
+            <b-navbar-nav class="ml-auto">
+                <b-nav-form>
+                    <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
+                    <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
+                </b-nav-form>
+                <hr />
+                <template>
+                    <div>
+                        <div>
+                            排序:
+                            <b>{{ sortDesc ? '倒序' : '正序' }}</b>
+                        </div>
+                        <b-table :items="items" :fields="fields" :sort-by.sync="sortBy"
+                                 :sort-desc.sync="sortDesc"
+                                 sort-icon-left striped responsive="sm">
+                            <template #cell(show_details)="row">
+                                <b-button size="sm" @@click="row.toggleDetails" class="mr-2">
+                                    {{ row.detailsShowing ? '隱藏' : '顯示'}}
+                                </b-button>
+
+                                <!-- As `row.showDetails` is one-way, we call the toggleDetails function on @@change -->
+                                @*<b-form-checkbox v-model="row.detailsShowing" @@change="row.toggleDetails">
+                    Details via check
+                </b-form-checkbox>*@
+                            </template>
+
+                            <template #row-details="row">
+                                <b-card>
+                                    <b-row>
+                                        <b-col><b>訂單明細編號</b></b-col>
+                                        <b-col><b>物品ID</b></b-col>
+                                        <b-col><b>物品SN</b></b-col>
+                                        <b-col><b>物品狀態</b></b-col>
+                                        <b-col><b>問題反映</b></b-col>
+                                        <b-col><b>動作</b></b-col>
+                                    </b-row>
+                                    <hr />
+                                    <b-row v-for="item in row.item.orderDetails">
+                                        <b-col>{{ item.orderDetailId }}</b-col>
+                                        <b-col>{{ item.itemId }}</b-col>
+                                        <b-col>{{ item.itemSn }}</b-col>
+                                        <b-col>{{ item.orderDetailStatus }}</b-col>
+                                        <b-col><b-button size="sm" @@click="">查看</b-button></b-col>
+                                        <b-col>
+                                            <b-button size="sm" @@click="">歸還</b-button>
+                                            <b-button size="sm" @@click="">遺失</b-button>
+                                        </b-col>
+
+                                    </b-row>
+
+
+
+                                    <b-button size="sm" @@click="row.toggleDetails">隱藏</b-button>
+                                </b-card>
+                            </template>
+                        </b-table>
+                    </div>
+                </template>
+        </b-tab>
+        <!--CLOSED ORDERS-->
+        <b-tab title="已結束" v-on:click="ClosedOrders">
+            <b-navbar-nav class="ml-auto">
+                <b-nav-form>
+                    <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
+                    <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
+                </b-nav-form>
+                <hr />
+                <template>
+                    <div>
+                        <div>
+                            排序:
+                            <b>{{ sortDesc ? '倒序' : '正序' }}</b>
+                        </div>
+                        <b-table :items="items" :fields="fields" :sort-by.sync="sortBy"
+                                 :sort-desc.sync="sortDesc"
+                                 sort-icon-left striped responsive="sm">
+                            <template #cell(show_details)="row">
+                                <b-button size="sm" @@click="row.toggleDetails" class="mr-2">
+                                    {{ row.detailsShowing ? '隱藏' : '顯示'}}
+                                </b-button>
+
+                                <!-- As `row.showDetails` is one-way, we call the toggleDetails function on @@change -->
+                                @*<b-form-checkbox v-model="row.detailsShowing" @@change="row.toggleDetails">
+                    Details via check
+                </b-form-checkbox>*@
+                            </template>
+
+                            <template #row-details="row">
+                                <b-card>
+                                    <b-row>
+                                        <b-col><b>訂單明細編號</b></b-col>
+                                        <b-col><b>物品ID</b></b-col>
+                                        <b-col><b>物品SN</b></b-col>
+                                        <b-col><b>物品狀態</b></b-col>
+                                    </b-row>
+                                    <hr />
+                                    <b-row v-for="item in row.item.orderDetails">
+                                        <b-col>{{ item.orderDetailId }}</b-col>
+                                        <b-col>{{ item.itemId }}</b-col>
+                                        <b-col>{{ item.itemSn }}</b-col>
+                                        <b-col>{{ item.orderDetailStatus }}</b-col>
+                                    </b-row>
+
+
+
+                                    <b-button size="sm" @@click="row.toggleDetails">隱藏</b-button>
+                                </b-card>
+                            </template>
+                        </b-table>
+                    </div>
+                </template>
+        </b-tab>
+        <!--OVERDUE ORDERS-->
+        <b-tab title="已逾期" v-on:click="OverDueOrders">
+            <b-navbar-nav class="ml-auto">
+                <b-nav-form>
+                    <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
+                    <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
+                </b-nav-form>
+                <hr />
+                <template>
+                    <div>
+                        <div>
+                            排序:
+                            <b>{{ sortDesc ? '倒序' : '正序' }}</b>
+                        </div>
+                        <b-table :items="items" :fields="fields" :sort-by.sync="sortBy"
+                                 :sort-desc.sync="sortDesc"
+                                 sort-icon-left striped responsive="sm">
+                            <template #cell(show_details)="row">
+                                <b-button size="sm" @@click="row.toggleDetails" class="mr-2">
+                                    {{ row.detailsShowing ? '隱藏' : '顯示'}}
+                                </b-button>
+
+                                <!-- As `row.showDetails` is one-way, we call the toggleDetails function on @@change -->
+                                @*<b-form-checkbox v-model="row.detailsShowing" @@change="row.toggleDetails">
+                    Details via check
+                </b-form-checkbox>*@
+                            </template>
+
+                            <template #row-details="row">
+                                <b-card>
+                                    <b-row>
+                                        <b-col><b>訂單明細編號</b></b-col>
+                                        <b-col><b>物品ID</b></b-col>
+                                        <b-col><b>物品SN</b></b-col>
+                                        <b-col><b>物品狀態</b></b-col>
+                                        <b-col><b>問題反映</b></b-col>
+                                        <b-col><b>動作</b></b-col>
+                                        <b-col><b>罰金</b></b-col>
+                                    </b-row>
+                                    <hr />
+                                    <b-row v-for="item in row.item.orderDetails">
+                                        <b-col>{{ item.orderDetailId }}</b-col>
+                                        <b-col>{{ item.itemId }}</b-col>
+                                        <b-col>{{ item.itemSn }}</b-col>
+                                        <b-col>{{ item.orderDetailStatus }}</b-col>
+                                        <b-col><b-button size="sm" @@click="">查看</b-button></b-col>
+                                        <b-col>
+                                            <b-button size="sm" @@click="">歸還</b-button>
+                                            <b-button size="sm" @@click="">遺失</b-button>
+                                        </b-col>
+                                        <b-col>還沒說怎麼計算!</b-col>
+                                    </b-row>
+
+
+
+                                    <b-button size="sm" @@click="row.toggleDetails">隱藏</b-button>
+                                </b-card>
+                            </template>
+                        </b-table>
+                    </div>
+                </template>
 </b-tab>
-            <b-tab title="待核可">
-                <b-navbar-nav class="ml-auto">
-                    <b-nav-form>
-                        <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
-                        <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
-                    </b-nav-form>
-                    <p>分配item後核可送出</p>
-                    <hr />
-                    <template>
-                        <div>
-                            <b-table :items="items" :fields="fields" striped responsive="sm">
-                                <template #cell(show_details)="row">
-                                    <b-button size="sm" @@click="row.toggleDetails" class="mr-2">
-                                        {{ row.detailsShowing ? '隱藏' : '顯示'}}
-                                    </b-button>
 
-                                    <!-- As `row.showDetails` is one-way, we call the toggleDetails function on @@change -->
-                                    <b-form-checkbox v-model="row.detailsShowing" @@change="row.toggleDetails">
-                                        Details via check
-                                    </b-form-checkbox>
-                                </template>
-
-                                <template #row-details="row">
-                                    <b-card>
-                                        <b-row class="mb-2">
-                                            <b-col sm="3" class="text-sm-right"><b>itemId:</b></b-col>
-                                            <b-col>{{ row.item.itemId }}</b-col>
-                                        </b-row>
-
-                                        <b-row class="mb-2">
-                                            <b-col sm="3" class="text-sm-right"><b>itemSN:</b></b-col>
-                                            <b-col>{{ row.item.itemSN }}</b-col>
-                                        </b-row>
-
-                                        <b-button size="sm" @@click="row.toggleDetails">隱藏</b-button>
-                                    </b-card>
-                                </template>
-                            </b-table>
-                        </div>
-                    </template>
-</b-tab>
-            <b-tab title="待領取">
-                <b-navbar-nav class="ml-auto">
-                    <b-nav-form>
-                        <b-form-input size="sm" class="mr-sm-2" placeholder="Search"></b-form-input>
-                        <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
-                    </b-nav-form>
-                    <hr />
-                    <template>
-                        <div>
-                            <b-table :items="items" :fields="fields" striped responsive="sm">
-                                <template #cell(show_details)="row">
-                                    <b-button size="sm" @@click="row.toggleDetails" class="mr-2">
-                                        {{ row.detailsShowing ? '隱藏' : '顯示'}}
-                                    </b-button>
-
-                                    <!-- As `row.showDetails` is one-way, we call the toggleDetails function on @@change -->
-                                    <b-form-checkbox v-model="row.detailsShowing" @@change="row.toggleDetails">
-                                        Details via check
-                                    </b-form-checkbox>
-                                </template>
-
-                                <template #row-details="row">
-                                    <b-card>
-                                        <b-row class="mb-2">
-                                            <b-col sm="3" class="text-sm-right"><b>itemId:</b></b-col>
-                                            <b-col>{{ row.item.itemId }}</b-col>
-                                        </b-row>
-
-                                        <b-row class="mb-2">
-                                            <b-col sm="3" class="text-sm-right"><b>itemSN:</b></b-col>
-                                            <b-col>{{ row.item.itemSN }}</b-col>
-                                        </b-row>
-
-                                        <b-button size="sm" @@click="row.toggleDetails">隱藏</b-button>
-                                    </b-card>
-                                </template>
-                            </b-table>
-                        </div>
-                    </template>
-            </b-tab>
-            <b-tab title="租借中">
-                <p>I'm the tab with the very, very long title</p>
-            </b-tab>
-            <b-tab title="已結束">
-                <p>I'm a disabled tab!</p>
-            </b-tab>
-            <b-tab title="已逾期">
-                <p>I'm a disabled tab!</p>
-            </b-tab>
-        </b-tabs>
-    
-
-   
+    </b-tabs>
 </div>
+<br />
+<br />
+
+
+
 
 <script>
-    new Vue({
+
+
+    let app = new Vue({
         el: '#app',
-        
+
         data() {
             return {
-                fields: ['OrderId', 'UserId', 'EquipmentId', '設備名稱', 'Quantity', 'EstimatePickupTime', 'Days', '總價', '訂單狀態', '下單時間', 'show_details'],
-                items: [
-                    //{ itemSN: true, itemId: 40, OrderId: 'Dickerson', UserId: 'Macdonald' },
-                    //{ itemSN: false, itemId: 21, OrderId: 'Larsen', UserId: 'Shaw', _showDetails: true },
-                    //{ itemSN: false, itemId: 89, OrderId: 'Geneva', UserId: 'Wilson'},
-                    //{ itemSN: true, itemId: 38, OrderId: 'Jami', UserId: 'Carney' }
-                    {
-                        isActive: true, age: 40, first_name: 'Dickerson', last_name: 'Macdonald', loop: [
-                            {
-                                orderDetailId: 3,
-                                itemId: 3,
-                                orderDetailStatus: "已領取",
+                sortBy: 'orderId',
+                sortDesc: false,
+                fields: [
+                    { key: 'orderId', label: '訂單編號', sortable: true  },
+                    { key: 'username', label: '使用者', sortable: true  },
+                    { key: 'equipmentId', label: '設備ID', sortable: true  },
+                    { key: 'equipmentName', label: '設備名稱', sortable: true  },
+                    { key: 'quantity', label: '數量', sortable: true },
+                    { key: 'estimatedPickupTime', label: '預計取用日期', sortable: true  },
+                    { key: 'day', label: '租期', sortable: true },
+                    { key: 'totalPrice1', label: '總價', sortable: true },
+                    { key: 'statusName', label: '狀態', sortable: true },
+                    { key: 'orderTime', label: '下單時間', sortable: true },
+                    { key: 'show_details', label: '明細' }
+                ],
+                items: [],
+                selectMode: 'multi',
+                selected: [],
+                
 
-                            },
-                            {
-                                orderDetailId: 4,
-                                itemId: 8,
-                                orderDetailStatus: "已領取",
-
-                            }
-                    }
-                ]
             }
-        }
-                //beforeCreate: function () {
-                //    fetch('OrderApi/GetAllOrders', { method: 'GET' })
-                //        .then(response => {
-                //            if (response.ok) {
-                //                return response.json();
-                //            }
-                //        })
-                //        .then(response => {
-                //            this.items = response;
-                //        });
+        },
+        beforeCreate: function () {
+            fetch('/OrderApi/GetOrders/', { method: 'GET' })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                })
+                .then(response => {
+                    this.items = response;
 
-                //}
-        
-        
+                    for (let i = 0; i < this.items.length; i++) {
+                        this.items[i].totalPrice1 = this.items[i].quantity * this.items[i].day * this.items[i].unitPrice;
+                    }
+                    
+                })
+        },
+                
+        methods: {
+            GetAllOrders: function () {
+                let url = '/OrderApi/GetOrders/';
+                let request = {
+                    method: 'GET',
+                    headers: { 'content-type': 'application/json'}
+                }
+                fetch(url, request)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                    })
+                    .then(response => {
+                        this.items = response;
+
+                        for (let i = 0; i < this.items.length; i++) {
+                            this.items[i].totalPrice1 = this.items[i].quantity * this.items[i].day * this.items[i].unitPrice;
+                        }
+                    });
+            },
+            //GetPendingOrders: this.GetAllOrders.filter(o => o.tabName === "待核可"),
+            GetPendingOrders: function () {
+                let url = '/OrderApi/GetOrders/';
+                let request = {
+                    method: 'GET',
+                    headers: { 'content-type': 'application/json' },
+                }
+                fetch(url, request)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                    })
+                    .then(response => {
+                        this.fields = [{ key: 'selected', label: '選擇' }, { key: 'orderId', label: '訂單編號', sortable: true },
+                            { key: 'username', label: '使用者', sortable: true },
+                            { key: 'equipmentId', label: '設備ID', sortable: true },
+                            { key: 'equipmentName', label: '設備名稱', sortable: true },
+                            { key: 'quantity', label: '數量', sortable: true },
+                            { key: 'estimatedPickupTime', label: '預計取用日期', sortable: true },
+                            { key: 'day', label: '租期', sortable: true },
+                            { key: 'totalPrice1', label: '總價', sortable: true },
+                            { key: 'statusName', label: '狀態', sortable: true },
+                            { key: 'orderTime', label: '下單時間', sortable: true }];
+                        this.items = response;
+
+                        for (let i = 0; i < this.items.length; i++) {
+                            this.items[i].totalPrice1 = this.items[i].quantity * this.items[i].day * this.items[i].unitPrice;
+                        }
+                    });
+
+            },
+            onRowSelected(items) {
+                this.selected = items
+            },
+            selectAllRows() {
+                this.$refs.selectableTable.selectAllRows()
+            },
+            clearSelected() {
+                this.$refs.selectableTable.clearSelected()
+            },
+            PickUpOrders: function () {
+                let url = '/OrderApi/GetOrders/';
+                let request = {
+                    method: 'GET',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify({ tab:'待領取' })
+                }
+                fetch(url, request)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                    })
+                    .then(response => {
+                        this.fields = [{ key: 'orderId', label: '訂單編號', sortable: true },
+                            { key: 'username', label: '使用者', sortable: true },
+                            { key: 'equipmentId', label: '設備ID', sortable: true },
+                            { key: 'equipmentName', label: '設備名稱', sortable: true },
+                            { key: 'quantity', label: '數量', sortable: true },
+                            { key: 'estimatedPickupTime', label: '預計取用日期', sortable: true },
+                            { key: 'day', label: '租期', sortable: true },
+                            { key: 'totalPrice1', label: '總價', sortable: true },
+                            { key: 'statusName', label: '狀態', sortable: true },
+                            { key: 'orderTime', label: '下單時間', sortable: true },
+                        { key: 'show_details', label: '明細' }];
+                        this.items = response;
+
+                        for (let i = 0; i < this.items.length; i++) {
+                            this.items[i].totalPrice1 = this.items[i].quantity * this.items[i].day * this.items[i].unitPrice;
+                        }
+                    });
+
+            },
+            OnGoingOrders: function () {
+                let url = '/OrderApi/GetOrders/';
+                let request = {
+                    method: 'GET',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify({ tab:'租借中' })
+                }
+                fetch(url, request)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                    })
+                    .then(response => {
+                        this.fields = [{ key: 'orderId', label: '訂單編號', sortable: true },
+                            { key: 'username', label: '使用者', sortable: true },
+                            { key: 'equipmentId', label: '設備ID', sortable: true },
+                            { key: 'equipmentName', label: '設備名稱', sortable: true },
+                            { key: 'quantity', label: '數量', sortable: true },
+                            { key: 'estimatedPickupTime', label: '預計取用日期', sortable: true },
+                            { key: 'day', label: '租期', sortable: true },
+                            { key: 'totalPrice1', label: '總價', sortable: true },
+                            { key: 'statusName', label: '狀態', sortable: true },
+                            { key: 'orderTime', label: '下單時間', sortable: true },
+                        { key: 'show_details', label: '明細' }];
+                        this.items = response;
+
+                        for (let i = 0; i < this.items.length; i++) {
+                            this.items[i].totalPrice1 = this.items[i].quantity * this.items[i].day * this.items[i].unitPrice;
+                        }
+                    });
+
+            },
+            ClosedOrders: function() {
+                let url = '/OrderApi/GetOrders/';
+                let request = {
+                    method: 'GET',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify({ tab:'已結束' })
+                }
+                fetch(url, request)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                    })
+                    .then(response => {
+                        this.fields = [{ key: 'orderId', label: '訂單編號', sortable: true },
+                            { key: 'username', label: '使用者', sortable: true },
+                            { key: 'equipmentId', label: '設備ID', sortable: true },
+                            { key: 'equipmentName', label: '設備名稱', sortable: true },
+                            { key: 'quantity', label: '數量', sortable: true },
+                            { key: 'estimatedPickupTime', label: '預計取用日期', sortable: true },
+                            { key: 'day', label: '租期', sortable: true },
+                            { key: 'totalPrice1', label: '總價', sortable: true },
+                            { key: 'statusName', label: '狀態', sortable: true },
+                            { key: 'orderTime', label: '下單時間', sortable: true },
+                        { key: 'show_details', label: '明細' }];
+                        this.items = response;
+
+                        for (let i = 0; i < this.items.length; i++) {
+                            this.items[i].totalPrice1 = this.items[i].quantity * this.items[i].day * this.items[i].unitPrice;
+                        }
+                    });
+
+            },
+            OverDueOrders: function() {
+                let url = '/OrderApi/GetOrders/';
+                let request = {
+                    method: 'GET',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify({ tab:'已逾期' })
+                }
+                fetch(url, request)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.json();
+                        }
+                    })
+                    .then(response => {
+                        this.fields = [{ key: 'orderId', label: '訂單編號', sortable: true },
+                            { key: 'username', label: '使用者', sortable: true },
+                            { key: 'equipmentId', label: '設備ID', sortable: true },
+                            { key: 'equipmentName', label: '設備名稱', sortable: true },
+                            { key: 'quantity', label: '數量', sortable: true },
+                            { key: 'estimatedPickupTime', label: '預計取用日期', sortable: true },
+                            { key: 'day', label: '租期', sortable: true },
+                            { key: 'totalPrice1', label: '總價', sortable: true },
+                            { key: 'statusName', label: '狀態', sortable: true },
+                            { key: 'orderTime', label: '下單時間', sortable: true },
+                        { key: 'show_details', label: '明細', }];
+                        this.items = response;
+
+                        for (let i = 0; i < this.items.length; i++) {
+                            this.items[i].totalPrice1 = this.items[i].quantity * this.items[i].day * this.items[i].unitPrice;
+                        }
+                    });
+
+            }
+
+        }
     })
+
 </script>
 
 
