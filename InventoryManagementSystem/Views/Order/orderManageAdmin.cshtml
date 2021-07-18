@@ -56,38 +56,38 @@
                                  :sort-desc.sync="sortDesc"
                                  sort-icon-left
                                  responsive="sm" striped>
-                        <template #cell(show_details)="row">
-                            <b-button size="sm" @@click="row.toggleDetails" class="mr-2">
-                                {{ row.detailsShowing ? '隱藏' : '顯示'}}
-                            </b-button>
+                            <template #cell(show_details)="row">
+                                <b-button size="sm" @@click="row.toggleDetails" class="mr-2">
+                                    {{ row.detailsShowing ? '隱藏' : '顯示'}}
+                                </b-button>
 
-                            <!-- As `row.showDetails` is one-way, we call the toggleDetails function on @@change -->
-                            @*<b-form-checkbox v-model="row.detailsShowing" @@change="row.toggleDetails">
-                Details via check
-            </b-form-checkbox>*@
-                        </template>
+                                <!-- As `row.showDetails` is one-way, we call the toggleDetails function on @@change -->
+                                @*<b-form-checkbox v-model="row.detailsShowing" @@change="row.toggleDetails">
+                                        Details via check
+                                    </b-form-checkbox>*@
+                            </template>
 
-                        <template #row-details="row">
-                            <b-card>
-                                <b-row>
-                                    <b-col><b>訂單明細編號</b></b-col>
-                                    <b-col><b>物品ID</b></b-col>
-                                    <b-col><b>物品SN</b></b-col>
-                                    <b-col><b>物品狀態</b></b-col>
-                                </b-row>
-                                <hr />
-                                <b-row v-for="item in row.item.orderDetails">
-                                    <b-col>{{ item.orderDetailId }}</b-col>
-                                    <b-col>{{ item.itemId }}</b-col>
-                                    <b-col>{{ item.itemSn }}</b-col>
-                                    <b-col>{{ item.orderDetailStatus }}</b-col>
-                                </b-row>
+                            <template #row-details="row">
+                                <b-card>
+                                    <b-row>
+                                        <b-col><b>訂單明細編號</b></b-col>
+                                        <b-col><b>物品ID</b></b-col>
+                                        <b-col><b>物品SN</b></b-col>
+                                        <b-col><b>物品狀態</b></b-col>
+                                    </b-row>
+                                    <hr />
+                                    <b-row v-for="item in row.item.orderDetails">
+                                        <b-col>{{ item.orderDetailId }}</b-col>
+                                        <b-col>{{ item.itemId }}</b-col>
+                                        <b-col>{{ item.itemSn }}</b-col>
+                                        <b-col>{{ item.orderDetailStatus }}</b-col>
+                                    </b-row>
 
 
 
-                                <b-button size="sm" @@click="row.toggleDetails">隱藏</b-button>
-                            </b-card>
-                        </template>
+                                    <b-button size="sm" @@click="row.toggleDetails">隱藏</b-button>
+                                </b-card>
+                            </template>
                         </b-table>
                     </div>
                 </template>
@@ -184,8 +184,8 @@
 
                                 <!-- As `row.showDetails` is one-way, we call the toggleDetails function on @@change -->
                                 @*<b-form-checkbox v-model="row.detailsShowing" @@change="row.toggleDetails">
-                    Details via check
-                </b-form-checkbox>*@
+                                        Details via check
+                                    </b-form-checkbox>*@
                             </template>
 
                             <template #row-details="row">
@@ -246,8 +246,8 @@
 
                                 <!-- As `row.showDetails` is one-way, we call the toggleDetails function on @@change -->
                                 @*<b-form-checkbox v-model="row.detailsShowing" @@change="row.toggleDetails">
-                    Details via check
-                </b-form-checkbox>*@
+                                        Details via check
+                                    </b-form-checkbox>*@
                             </template>
 
                             <template #row-details="row">
@@ -307,8 +307,8 @@
 
                                 <!-- As `row.showDetails` is one-way, we call the toggleDetails function on @@change -->
                                 @*<b-form-checkbox v-model="row.detailsShowing" @@change="row.toggleDetails">
-                    Details via check
-                </b-form-checkbox>*@
+                                        Details via check
+                                    </b-form-checkbox>*@
                             </template>
 
                             <template #row-details="row">
@@ -360,8 +360,8 @@
 
                                 <!-- As `row.showDetails` is one-way, we call the toggleDetails function on @@change -->
                                 @*<b-form-checkbox v-model="row.detailsShowing" @@change="row.toggleDetails">
-                    Details via check
-                </b-form-checkbox>*@
+                                        Details via check
+                                    </b-form-checkbox>*@
                             </template>
 
                             <template #row-details="row">
@@ -397,7 +397,7 @@
                         </b-table>
                     </div>
                 </template>
-</b-tab>
+        </b-tab>
 
     </b-tabs>
 </div>
@@ -408,8 +408,6 @@
 
 
 <script>
-
-
     let app = new Vue({
         el: '#app',
 
@@ -418,23 +416,22 @@
                 sortBy: 'orderId',
                 sortDesc: false,
                 fields: [
-                    { key: 'orderId', label: '訂單編號', sortable: true  },
-                    { key: 'username', label: '使用者', sortable: true  },
-                    { key: 'equipmentId', label: '設備ID', sortable: true  },
-                    { key: 'equipmentName', label: '設備名稱', sortable: true  },
+                    { key: 'orderId', label: '訂單編號', sortable: true },
+                    { key: 'username', label: '使用者', sortable: true },
+                    { key: 'equipmentId', label: '設備ID', sortable: true },
+                    { key: 'equipmentName', label: '設備名稱', sortable: true },
                     { key: 'quantity', label: '數量', sortable: true },
-                    { key: 'estimatedPickupTime', label: '預計取用日期', sortable: true  },
+                    { key: 'estimatedPickupTime', label: '預計取用日期', sortable: true },
                     { key: 'day', label: '租期', sortable: true },
-                    { key: 'totalPrice1', label: '總價', sortable: true },
+                    { key: 'totalPrice', label: '總價', sortable: true },
                     { key: 'statusName', label: '狀態', sortable: true },
                     { key: 'orderTime', label: '下單時間', sortable: true },
                     { key: 'show_details', label: '明細' }
                 ],
                 items: [],
+                orders: [], // 存一開始拿到的所有訂單
                 selectMode: 'multi',
                 selected: [],
-                
-
             }
         },
         beforeCreate: function () {
@@ -445,67 +442,40 @@
                     }
                 })
                 .then(response => {
-                    this.items = response;
+                    this.items = this.orders = response;
 
-                    for (let i = 0; i < this.items.length; i++) {
-                        this.items[i].totalPrice1 = this.items[i].quantity * this.items[i].day * this.items[i].unitPrice;
+                    // Calculate total price
+                    for (let i = 0; i < this.orders.length; i++) {
+                        this.orders[i].totalPrice =
+                            this.orders[i].quantity *
+                            this.orders[i].day *
+                            this.orders[i].unitPrice;
                     }
-                    
                 })
         },
-                
-        methods: {
-            GetAllOrders: function () {
-                let url = '/OrderApi/GetOrders/';
-                let request = {
-                    method: 'GET',
-                    headers: { 'content-type': 'application/json'}
-                }
-                fetch(url, request)
-                    .then(response => {
-                        if (response.ok) {
-                            return response.json();
-                        }
-                    })
-                    .then(response => {
-                        this.items = response;
 
-                        for (let i = 0; i < this.items.length; i++) {
-                            this.items[i].totalPrice1 = this.items[i].quantity * this.items[i].day * this.items[i].unitPrice;
-                        }
-                    });
+        methods: {
+            // 所有訂單
+            GetAllOrders: function () {
+                // 直接拿所有訂單，不用 filter
+                this.items = this.orders;
             },
             //GetPendingOrders: this.GetAllOrders.filter(o => o.tabName === "待核可"),
+            // 待核可
             GetPendingOrders: function () {
-                let url = '/OrderApi/GetOrders/';
-                let request = {
-                    method: 'GET',
-                    headers: { 'content-type': 'application/json' },
-                }
-                fetch(url, request)
-                    .then(response => {
-                        if (response.ok) {
-                            return response.json();
-                        }
-                    })
-                    .then(response => {
-                        this.fields = [{ key: 'selected', label: '選擇' }, { key: 'orderId', label: '訂單編號', sortable: true },
-                            { key: 'username', label: '使用者', sortable: true },
-                            { key: 'equipmentId', label: '設備ID', sortable: true },
-                            { key: 'equipmentName', label: '設備名稱', sortable: true },
-                            { key: 'quantity', label: '數量', sortable: true },
-                            { key: 'estimatedPickupTime', label: '預計取用日期', sortable: true },
-                            { key: 'day', label: '租期', sortable: true },
-                            { key: 'totalPrice1', label: '總價', sortable: true },
-                            { key: 'statusName', label: '狀態', sortable: true },
-                            { key: 'orderTime', label: '下單時間', sortable: true }];
-                        this.items = response;
-
-                        for (let i = 0; i < this.items.length; i++) {
-                            this.items[i].totalPrice1 = this.items[i].quantity * this.items[i].day * this.items[i].unitPrice;
-                        }
-                    });
-
+                this.fields = [
+                    { key: 'selected', label: '選擇' },
+                    { key: 'orderId', label: '訂單編號', sortable: true },
+                    { key: 'username', label: '使用者', sortable: true },
+                    { key: 'equipmentId', label: '設備ID', sortable: true },
+                    { key: 'equipmentName', label: '設備名稱', sortable: true },
+                    { key: 'quantity', label: '數量', sortable: true },
+                    { key: 'estimatedPickupTime', label: '預計取用日期', sortable: true },
+                    { key: 'day', label: '租期', sortable: true },
+                    { key: 'totalPrice', label: '總價', sortable: true },
+                    { key: 'statusName', label: '狀態', sortable: true },
+                    { key: 'orderTime', label: '下單時間', sortable: true }];
+                this.items = this.orders.filter(o => o.tabName === "待核可");
             },
             onRowSelected(items) {
                 this.selected = items
@@ -516,142 +486,72 @@
             clearSelected() {
                 this.$refs.selectableTable.clearSelected()
             },
+            // 待領取
             PickUpOrders: function () {
-                let url = '/OrderApi/GetOrders/';
-                let request = {
-                    method: 'GET',
-                    headers: { 'content-type': 'application/json' },
-                    body: JSON.stringify({ tab:'待領取' })
-                }
-                fetch(url, request)
-                    .then(response => {
-                        if (response.ok) {
-                            return response.json();
-                        }
-                    })
-                    .then(response => {
-                        this.fields = [{ key: 'orderId', label: '訂單編號', sortable: true },
-                            { key: 'username', label: '使用者', sortable: true },
-                            { key: 'equipmentId', label: '設備ID', sortable: true },
-                            { key: 'equipmentName', label: '設備名稱', sortable: true },
-                            { key: 'quantity', label: '數量', sortable: true },
-                            { key: 'estimatedPickupTime', label: '預計取用日期', sortable: true },
-                            { key: 'day', label: '租期', sortable: true },
-                            { key: 'totalPrice1', label: '總價', sortable: true },
-                            { key: 'statusName', label: '狀態', sortable: true },
-                            { key: 'orderTime', label: '下單時間', sortable: true },
-                        { key: 'show_details', label: '明細' }];
-                        this.items = response;
-
-                        for (let i = 0; i < this.items.length; i++) {
-                            this.items[i].totalPrice1 = this.items[i].quantity * this.items[i].day * this.items[i].unitPrice;
-                        }
-                    });
-
+                this.fields = [
+                    { key: 'orderId', label: '訂單編號', sortable: true },
+                    { key: 'username', label: '使用者', sortable: true },
+                    { key: 'equipmentId', label: '設備ID', sortable: true },
+                    { key: 'equipmentName', label: '設備名稱', sortable: true },
+                    { key: 'quantity', label: '數量', sortable: true },
+                    { key: 'estimatedPickupTime', label: '預計取用日期', sortable: true },
+                    { key: 'day', label: '租期', sortable: true },
+                    { key: 'totalPrice', label: '總價', sortable: true },
+                    { key: 'statusName', label: '狀態', sortable: true },
+                    { key: 'orderTime', label: '下單時間', sortable: true },
+                    { key: 'show_details', label: '明細' }];
+                this.items = this.orders.filter(o => o.tabName === "待領取");
             },
+            // 租借中
             OnGoingOrders: function () {
-                let url = '/OrderApi/GetOrders/';
-                let request = {
-                    method: 'GET',
-                    headers: { 'content-type': 'application/json' },
-                    body: JSON.stringify({ tab:'租借中' })
-                }
-                fetch(url, request)
-                    .then(response => {
-                        if (response.ok) {
-                            return response.json();
-                        }
-                    })
-                    .then(response => {
-                        this.fields = [{ key: 'orderId', label: '訂單編號', sortable: true },
-                            { key: 'username', label: '使用者', sortable: true },
-                            { key: 'equipmentId', label: '設備ID', sortable: true },
-                            { key: 'equipmentName', label: '設備名稱', sortable: true },
-                            { key: 'quantity', label: '數量', sortable: true },
-                            { key: 'estimatedPickupTime', label: '預計取用日期', sortable: true },
-                            { key: 'day', label: '租期', sortable: true },
-                            { key: 'totalPrice1', label: '總價', sortable: true },
-                            { key: 'statusName', label: '狀態', sortable: true },
-                            { key: 'orderTime', label: '下單時間', sortable: true },
-                        { key: 'show_details', label: '明細' }];
-                        this.items = response;
-
-                        for (let i = 0; i < this.items.length; i++) {
-                            this.items[i].totalPrice1 = this.items[i].quantity * this.items[i].day * this.items[i].unitPrice;
-                        }
-                    });
-
+                this.fields = [
+                    { key: 'orderId', label: '訂單編號', sortable: true },
+                    { key: 'username', label: '使用者', sortable: true },
+                    { key: 'equipmentId', label: '設備ID', sortable: true },
+                    { key: 'equipmentName', label: '設備名稱', sortable: true },
+                    { key: 'quantity', label: '數量', sortable: true },
+                    { key: 'estimatedPickupTime', label: '預計取用日期', sortable: true },
+                    { key: 'day', label: '租期', sortable: true },
+                    { key: 'totalPrice', label: '總價', sortable: true },
+                    { key: 'statusName', label: '狀態', sortable: true },
+                    { key: 'orderTime', label: '下單時間', sortable: true },
+                    { key: 'show_details', label: '明細' }];
+                this.items = this.orders.filter(o => o.tabName === "租借中");
             },
-            ClosedOrders: function() {
-                let url = '/OrderApi/GetOrders/';
-                let request = {
-                    method: 'GET',
-                    headers: { 'content-type': 'application/json' },
-                    body: JSON.stringify({ tab:'已結束' })
-                }
-                fetch(url, request)
-                    .then(response => {
-                        if (response.ok) {
-                            return response.json();
-                        }
-                    })
-                    .then(response => {
-                        this.fields = [{ key: 'orderId', label: '訂單編號', sortable: true },
-                            { key: 'username', label: '使用者', sortable: true },
-                            { key: 'equipmentId', label: '設備ID', sortable: true },
-                            { key: 'equipmentName', label: '設備名稱', sortable: true },
-                            { key: 'quantity', label: '數量', sortable: true },
-                            { key: 'estimatedPickupTime', label: '預計取用日期', sortable: true },
-                            { key: 'day', label: '租期', sortable: true },
-                            { key: 'totalPrice1', label: '總價', sortable: true },
-                            { key: 'statusName', label: '狀態', sortable: true },
-                            { key: 'orderTime', label: '下單時間', sortable: true },
-                        { key: 'show_details', label: '明細' }];
-                        this.items = response;
-
-                        for (let i = 0; i < this.items.length; i++) {
-                            this.items[i].totalPrice1 = this.items[i].quantity * this.items[i].day * this.items[i].unitPrice;
-                        }
-                    });
-
+            // 已結束
+            ClosedOrders: function () {
+                this.fields = [
+                    { key: 'orderId', label: '訂單編號', sortable: true },
+                    { key: 'username', label: '使用者', sortable: true },
+                    { key: 'equipmentId', label: '設備ID', sortable: true },
+                    { key: 'equipmentName', label: '設備名稱', sortable: true },
+                    { key: 'quantity', label: '數量', sortable: true },
+                    { key: 'estimatedPickupTime', label: '預計取用日期', sortable: true },
+                    { key: 'day', label: '租期', sortable: true },
+                    { key: 'totalPrice', label: '總價', sortable: true },
+                    { key: 'statusName', label: '狀態', sortable: true },
+                    { key: 'orderTime', label: '下單時間', sortable: true },
+                    { key: 'show_details', label: '明細' }];
+                this.items = this.orders.filter(o => o.tabName === "已結束");
             },
-            OverDueOrders: function() {
-                let url = '/OrderApi/GetOrders/';
-                let request = {
-                    method: 'GET',
-                    headers: { 'content-type': 'application/json' },
-                    body: JSON.stringify({ tab:'已逾期' })
-                }
-                fetch(url, request)
-                    .then(response => {
-                        if (response.ok) {
-                            return response.json();
-                        }
-                    })
-                    .then(response => {
-                        this.fields = [{ key: 'orderId', label: '訂單編號', sortable: true },
-                            { key: 'username', label: '使用者', sortable: true },
-                            { key: 'equipmentId', label: '設備ID', sortable: true },
-                            { key: 'equipmentName', label: '設備名稱', sortable: true },
-                            { key: 'quantity', label: '數量', sortable: true },
-                            { key: 'estimatedPickupTime', label: '預計取用日期', sortable: true },
-                            { key: 'day', label: '租期', sortable: true },
-                            { key: 'totalPrice1', label: '總價', sortable: true },
-                            { key: 'statusName', label: '狀態', sortable: true },
-                            { key: 'orderTime', label: '下單時間', sortable: true },
-                        { key: 'show_details', label: '明細', }];
-                        this.items = response;
-
-                        for (let i = 0; i < this.items.length; i++) {
-                            this.items[i].totalPrice1 = this.items[i].quantity * this.items[i].day * this.items[i].unitPrice;
-                        }
-                    });
-
+            // 已逾期
+            OverDueOrders: function () {
+                this.fields = [
+                    { key: 'orderId', label: '訂單編號', sortable: true },
+                    { key: 'username', label: '使用者', sortable: true },
+                    { key: 'equipmentId', label: '設備ID', sortable: true },
+                    { key: 'equipmentName', label: '設備名稱', sortable: true },
+                    { key: 'quantity', label: '數量', sortable: true },
+                    { key: 'estimatedPickupTime', label: '預計取用日期', sortable: true },
+                    { key: 'day', label: '租期', sortable: true },
+                    { key: 'totalPrice', label: '總價', sortable: true },
+                    { key: 'statusName', label: '狀態', sortable: true },
+                    { key: 'orderTime', label: '下單時間', sortable: true },
+                    { key: 'show_details', label: '明細', }];
+                this.items = this.orders.filter(o => o.tabName === "已逾期");
             }
-
         }
     })
-
 </script>
 
 
